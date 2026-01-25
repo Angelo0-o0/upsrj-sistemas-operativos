@@ -6,9 +6,40 @@
  * ============================================================ */
 void fcfs_schedule(Process p[], int n)
 {
-    (void)p;
-    (void)n;
-    /* TODO: Implement FCFS scheduling algorithm here */
+    // 1. Ordenar procesos por arrival_time (y por ID si hay empate)
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (p[j].arrival_time > p[j+1].arrival_time ||
+                (p[j].arrival_time == p[j+1].arrival_time && p[j].id > p[j+1].id)) {
+                // Intercambiar procesos
+                Process temp = p[j];
+                p[j] = p[j+1];
+                p[j+1] = temp;
+            }
+        }
+    }
+    
+    // 2. Calcular tiempos para cada proceso
+    int current_time = 0;
+    
+    for (int i = 0; i < n; i++) {
+        // Si el proceso llega después del tiempo actual
+        if (current_time < p[i].arrival_time) {
+            current_time = p[i].arrival_time;
+        }
+        
+        // Waiting time = tiempo esperando antes de ejecutar
+        p[i].waiting_time = current_time - p[i].arrival_time;
+        
+        // Avanzar tiempo por el burst del proceso
+        current_time += p[i].burst_time;
+        
+        // Turnaround time = tiempo total en el sistema
+        p[i].turnaround_time = current_time - p[i].arrival_time;
+        
+        // Marcar como completado
+        p[i].completed = 1;
+    }
 }
 
 /* ============================================================
